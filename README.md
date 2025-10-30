@@ -1,2 +1,264 @@
-# discord_workout_bot
-디스코드 채널에서 멤버들의 운동을 트래킹 해주는 근육봇
+# 🤖 근육몬 봇 (Muscle Bot)
+
+Discord 서버에서 일별 운동 스레드를 자동으로 생성하고, 운동 기록을 수집하여 통계를 제공하는 봇입니다.
+
+## 🌟 근육몬 봇의 역할
+
+근육몬 봇은 Discord 서버에서 운동 동호회 멤버들의 운동 습관을 관리하고 격려하는 봇입니다.
+
+### 핵심 기능
+- **자동 스레드 생성**: 매일 오전 9시(KST)에 당일 운동 스레드 자동 생성
+- **운동 기록 수집**: Discord 스레드에서 첨부파일이 있는 메시지를 운동 기록으로 인식
+- **통계 제공**: 개인별/전체 운동 통계 및 순위 제공
+- **격려 시스템**: 운동 현황에 따른 자동 격려 메시지 전송
+- **주간 리포트**: 매주 월요일 전주 운동 통계 자동 집계
+
+## 🤖 Discord 명령어
+
+### `!요약` - 전체 멤버 운동 요약
+
+전체 멤버의 운동 현황을 한눈에 볼 수 있습니다.
+
+```
+🏋️ 운동 멤버 요약
+전체 운동 기록 요약입니다.
+
+💪 사용자A
+총 운동일: 45일
+마지막 운동: 2025-10-29
+월평균 운동률: 65.2%
+최대 연속: 15일 (2025-09-12 ~ 2025-09-26)
+현재 연속: 0일
+최근 운동: 2025-10-29, 2025-10-28, 2025-10-27
+
+💪 사용자B
+총 운동일: 38일
+마지막 운동: 2025-10-27
+월평균 운동률: 58.1%
+최대 연속: 11일 (2025-09-09 ~ 2025-09-19)
+현재 연속: 0일
+최근 운동: 2025-10-27, 2025-10-25
+```
+
+### `!통계` - 월별/주간 운동 통계
+
+월별 및 주간 운동 통계를 제공합니다.
+
+```
+📊 월별 운동 통계 (최근 3개월)
+
+📅 2025년 10월
+사용자A: 19/31일 (61.3%)
+사용자B: 18/31일 (58.1%)
+사용자C: 12/31일 (38.7%)
+
+📅 2025년 9월
+사용자A: 21/30일 (70.0%)
+사용자B: 19/30일 (63.3%)
+사용자D: 15/30일 (50.0%)
+
+📈 주간 운동 통계 (최근 4주)
+
+📊 2025년 44주차 (2025-10-28 ~ 2025-11-03)
+사용자A: 3/7일 (42.9%)
+사용자B: 2/7일 (28.6%)
+사용자C: 1/7일 (14.3%)
+```
+
+## 📁 파일 구조
+
+```
+discord-bot/
+├── workout_bot_main.py          # 🚀 메인 실행 파일
+├── workout_bot_config.py        # ⚙️ 설정 파일 (토큰, DB 정보)
+├── workout_bot_commands.py      # 💬 Discord 명령어 (!요약, !통계)
+├── workout_bot_schedulers.py    # ⏰ 자동 스케줄러 (스레드 생성, 통계)
+├── workout_bot_database.py      # 🗄️ 데이터베이스 연결 및 관리
+├── daily_workout_collector.py   # 📊 운동 기록 수집 도구
+├── workout_bot_statistics.py    # 📈 통계 생성 도구
+└── README.md                    # 📖 이 파일
+```
+
+## ⚙️ CONFIG 설정 정보
+
+### 1. Discord 설정
+`workout_bot_config.py` 파일에서 다음 항목들을 설정하세요:
+
+```python
+# Discord 봇 토큰 (Discord Developer Portal에서 발급)
+DISCORD_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+
+# 운동 스레드를 생성할 채널 ID
+DISCORD_CHANNEL_ID = 1234567890123456789
+```
+
+### 2. 데이터베이스 설정
+```python
+DATABASE_CONFIG = {
+    'host': 'localhost',
+    'user': 'your_username',
+    'password': 'your_password',
+    'database': 'workout_db',
+    'charset': 'utf8mb4'
+}
+```
+
+### 3. 봇 권한 설정
+Discord Developer Portal에서 다음 권한들이 필요합니다:
+- `Send Messages`: 메시지 전송
+- `Create Public Threads`: 스레드 생성
+- `Send Messages in Threads`: 스레드 내 메시지 전송
+- `Use Slash Commands`: 명령어 사용
+- `Read Message History`: 메시지 기록 읽기
+
+## 🛠️ 설치 및 실행
+
+### 1. 패키지 설치
+```bash
+pip install discord.py mysql-connector-python pytz
+```
+
+### 2. 데이터베이스 설정
+MySQL/MariaDB에서 데이터베이스를 생성하고 설정 파일을 수정하세요.
+
+### 3. 봇 실행
+```bash
+python3 workout_bot_main.py
+```
+
+## 📊 상세 기능 설명
+
+### 자동화된 기능
+
+#### 일별 운동 스레드 생성
+- **시간**: 매일 오전 9시 (KST)
+- **형식**: `YY-MM-DD 요일명 운동 시작! 이모티콘`
+- **예시**: `25-10-30 수요일 운동 시작! 💯`
+
+#### 주간 통계 집계
+- **시간**: 매주 월요일 오전 9시
+- **내용**: 전주 운동 통계 자동 집계 및 채널 공유
+
+#### 격려 메시지 시스템
+- **운동 미완료 알림**: 매일 밤 10시
+- **혼자 운동 격려**: 매일 밤 11시 30분
+
+### 데이터베이스 구조
+
+#### workout_members 테이블
+- 운동 멤버 정보 관리
+- Discord 사용자 ID와 이름 연동
+- 개인별 운동 요약 통계 저장 (총 운동일, 연속 기록, 최근 운동 등)
+
+#### daily_workout_records 테이블
+- 일별 운동 기록 저장
+- 운동 날짜, 멤버 정보
+
+#### weekly_workout_records 테이블
+- 주간 운동 통계 집계
+- 주차별 운동일수, 운동률
+
+#### monthly_workout_records 테이블
+- 월별 운동 통계 집계
+- 월별 운동일수, 운동률
+
+## 🔧 개발자 가이드
+
+### 코드 구조 이해
+```python
+# 메인 봇 실행 흐름
+workout_bot_main.py
+├── workout_bot_config.py (설정 로드)
+├── workout_bot_commands.py (명령어 등록)
+└── workout_bot_schedulers.py (스케줄러 시작)
+
+# 명령어 처리 흐름
+@client.command(name='요약')
+├── workout_bot_database.py (DB 연결)
+├── 데이터 조회 및 처리
+└── Discord Embed 메시지 전송
+
+# 스케줄러 실행 흐름
+@tasks.loop(time=time(hour=0, minute=0, tzinfo=KST))
+├── 스레드 생성 (create_daily_workout_thread)
+├── 주간 통계 집계 (weekly_stats_auto)
+└── 격려 메시지 전송
+```
+
+### 새로운 명령어 추가 방법
+1. `workout_bot_commands.py`에 새 함수 추가:
+```python
+@client.command(name='새명령어')
+async def new_command(ctx):
+    # 명령어 로직 구현
+    await ctx.send("응답 메시지")
+```
+
+2. `setup_commands` 함수에서 자동으로 등록됨
+
+### 새로운 스케줄러 추가 방법
+1. `workout_bot_schedulers.py`에 새 태스크 추가:
+```python
+@tasks.loop(time=time(hour=12, minute=0))  # 매일 정오
+async def new_scheduler():
+    # 스케줄러 로직 구현
+    pass
+```
+
+2. `start_schedulers` 함수에서 시작 로직 추가
+
+## 🔍 문제 해결
+
+### 자주 발생하는 문제들
+
+1. **봇이 스레드를 생성하지 않는 경우**
+   - 봇 권한 확인 (스레드 생성 권한)
+   - 채널 ID 확인
+   - 중복 스레드 생성 방지 로직 확인
+
+2. **데이터베이스 연결 실패**
+   - 데이터베이스 설정 정보 확인
+   - 네트워크 연결 상태 확인
+   - 데이터베이스 서버 상태 확인
+
+3. **명령어가 작동하지 않는 경우**
+   - 봇의 메시지 읽기 권한 확인
+   - 명령어 prefix 확인 (!)
+   - 봇이 온라인 상태인지 확인
+
+### 로그 확인
+봇 실행 시 콘솔에 상세한 로그가 출력됩니다:
+```bash
+python3 workout_bot_main.py
+```
+
+### 주의사항
+
+#### Python 버전 호환성
+- ✅ **Python 3.12**: 완전 호환, 권장 버전
+- ❌ **Python 3.13**: `audioop` 모듈 제거로 discord.py와 호환성 문제
+
+#### 시간대 처리
+- `pytz` 라이브러리 사용하여 한국 시간(KST) 정확히 표시
+- YY-MM-DD 형식으로 간결하게 날짜 표시
+
+#### 보안
+- 봇 토큰을 안전하게 관리하세요
+- Discord Developer Portal에서 필요한 권한만 설정하세요
+
+## 📝 라이선스
+
+이 프로젝트는 개인 사용을 위한 목적으로 제작되었습니다.
+
+## 🤝 기여
+
+버그 리포트나 기능 제안이 있으시면 이슈를 등록해 주세요.
+
+---
+
+**최종 업데이트**: 2025년 10월 30일  
+**제작자**: 공룡 운동 동호회 🦕  
+**버전**: 1.0.0
+
+> 이 봇은 건강한 운동 문화 조성을 위해 제작되었습니다. 💪  
+> 꾸준한 운동으로 모두가 건강한 삶을 살아갑시다! 🌟
